@@ -14,7 +14,16 @@ app.use("/customer/auth/*", function auth(req,res,next){
     const authData = req.session && req.session.authorization;
     if (!authData) return res.status(401).json({message: "Login required"});
 
-    const token = authData.accessToken
+    const token = authData.accessToken;
+    if (!token) return res.status(401).json({message: "Token Missing"});
+
+    try {
+        const decoded = jwt.verify(token, "JWT_Token");
+
+        return next(); 
+    } catch (err) {
+        return res.status(403).json({message: "token Invalid"});
+    }
 });
  
 const PORT =5000;
